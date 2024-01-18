@@ -34,11 +34,11 @@ export function analyseAudio(analyser) {
 
         ctx.clearRect(0, 0, WIDTH, HEIGHT)
 
-        ctx.fillStyle = "skyblue"
+        ctx.fillStyle = "blueviolet"
         ctx.fillRect(0, 0, WIDTH, HEIGHT)
 
-        ctx.lineWidth = 2
-        ctx.strokeStyle = "rgb(0 0 0)"
+        ctx.lineWidth = 3
+        ctx.strokeStyle = "black"
 
 
         const sliceWidth = WIDTH / bufferLength
