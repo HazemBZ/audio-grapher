@@ -1,6 +1,7 @@
 import { Play, StopCircle } from 'lucide-react'
 import './App.css'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { analyseAudio } from './helpers/audioHelpers';
 
 
 // Note: If you just want to process 
@@ -9,10 +10,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 function App() {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
+  // const AUDIO_SRC = '/src/assets/Somewhere between grief, prayer & liberation.mp3'
+  const AUDIO_SRC = '/src/assets/All_ends_well.mp3'
 
   const [playing, setPlaying] = useState(false)
   const [gain, setGain] = useState(1)
-  const [volume, setVolume] = useState(1)
+  const [volume, setVolume] = useState(0.5)
   const [pan, setPan] = useState(0)
   const [audioElement, setAudioElement] = useState(null)
   const audioRef = useRef()
@@ -34,12 +37,24 @@ function App() {
     const pannerOptions = { pan: 0 };
     const panner = new StereoPannerNode(audioContext, pannerOptions);
 
+    /**
+     * Analyser
+     */
+
+
     let track = null
     if (audioElement) {
+      // The "source"
       const track = audioContext.createMediaElementSource(audioElement)
+      const analyser = audioContext.createAnalyser()
+      console.log('analyser ', analyser)
 
-      if (gainNode && panner) {
-        track.connect(gainNode).connect(panner).connect(audioContext.destination)
+
+      if (gainNode && panner && AudioContext && analyser) {
+        track.connect(analyser).connect(gainNode).connect(panner).connect(audioContext.destination)
+        analyseAudio(analyser)
+
+
 
       }
 
@@ -96,25 +111,26 @@ function App() {
   }, [panner])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', }}>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+      <canvas style={{ width: '80%', height: '150px', background: 'white', margin: 'auto', top: 0 }}></canvas>
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
           <input type='range' id="gain" className='rotate' min={-1} max={2} value={gain} step={0.01} onChange={onGainChange} />
           <label htmlFor='gain'>Gain</label>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <input type='range' id="volume" className='rotate' min={0} max={2} value={volume} step={0.01} onChange={onVolumeChange} />
+          <input type='range' id="volume" className='rotate' min={0} max={1} value={volume} step={0.01} onChange={onVolumeChange} />
           <label htmlFor='volume'>Volume</label>
         </div>
       </div>
 
-      <button style={{ display: 'block' }} onClick={togglePlay}>{playing ? (
+      <button style={{ display: 'block', width: 'fit-content' }} onClick={togglePlay}>{playing ? (
         <StopCircle />
       ) : (
         <Play />
       )}</button>
-      <audio ref={audioRef} src='/src/assets/Somewhere between grief, prayer & liberation.mp3' onEnded={() => setPlaying(false)}></audio>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <audio ref={audioRef} src={AUDIO_SRC} onEnded={() => setPlaying(false)}></audio>
+      <div >
         <input type="range" id="panner" min="-1" max="1" value={pan} step={0.01} onChange={onPannerChange} />
       </div>
     </div>

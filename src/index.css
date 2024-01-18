@@ -56,6 +56,17 @@ button:focus-visible {
 
 
 .rotate {
-  transform: rotate(-90deg) translate(50%);
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
   
 }
+
+
+#root, html,  body {
+  width: 100dvw;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
